@@ -3,7 +3,7 @@
         <!-- sidebar menu start-->
         <ul class="sidebar-menu">
           <li class="active">
-            <a class="" href="{!!url('list')!!}">
+            <a class="" href="{{ url('list') }}">
                           <i class="icon_house_alt"></i>
                           <span>Dashboard</span>
                       </a>
@@ -15,9 +15,9 @@
                           <span class="menu-arrow arrow_carrot-right"></span>
                       </a>
             <ul class="sub" style="display:block">
-              <li><a class="" href="{!!url('user')!!}">계정 관리</a></li>
-              <li><a class="" href="{!!url('event')!!}">이벤트 관리</a></li>
-              <li><a class="" href="{!!url('list')!!}">DB 관리</a></li>
+              <li><a class="" href="{{ url('user') }}">계정 관리</a></li>
+              <li><a class="" href="{{ url('event') }}">이벤트 관리</a></li>
+              <li><a class="" href="{{ url('list') }}">DB 관리</a></li>
               
             </ul>
           </li>
@@ -29,7 +29,7 @@
                           <span class="menu-arrow arrow_carrot-right"></span>
                       </a>
             <ul class="sub" style="display:block">
-              <li><a class="" href="{!!url('list')!!}">DB 관리</a></li>
+              <li><a class="" href="{{ url('list') }}">DB 관리</a></li>
              
             </ul>
           </li>
@@ -59,9 +59,9 @@
                           <span class="menu-arrow arrow_carrot-right"></span>
                       </a>
             <ul class="sub" style="display:block">
-              <li><a class="" href="{!!url('list')!!}">DB 관리</a></li>
-              <li><a class="" href="{!!url('user/create')!!}">계정 추가</a></li>
-                <li><a class="" href="{!!url('userPwd')!!}">계정 비밀번호 변경</a></li>
+              <li><a class="" href="{{ url('list') }}">DB 관리</a></li>
+              <li><a class="" href="{{ url('user/create') }}">계정 추가</a></li>
+                <li><a class="" href="{{ url('userPwd') }}">계정 비밀번호 변경</a></li>
             </ul>
           </li>
           @endif

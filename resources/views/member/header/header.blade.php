@@ -7,7 +7,7 @@
       
 
       <!--logo start-->
-      <a href=""{!!url('list')!!}"" class="logo">IK<span class="lite"> Solution</span></a>
+      <a href="{{ url('list') }}" class="logo">IK<span class="lite"> Solution</span></a>
       <!--logo end-->
 
       <div class="nav search-row" id="top_menu">

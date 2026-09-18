@@ -6,7 +6,7 @@
 
   <div class="container">
 
-    <form class="login-form" action="{!!url('login')!!}" method="post">
+    <form class="login-form" action="{{ url('login') }}" method="post">
      {{csrf_field()}}
       <div class="login-wrap">
         <p class="login-img"><i class="icon_lock_alt"></i></p>

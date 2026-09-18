@@ -8,7 +8,7 @@
             <h3 class="page-header"><i class="fa fa-files-o"></i> 계정 추가</h3>
 <!--
             <ol class="breadcrumb">
-              <li><i class="fa fa-home"></i><a href="index.html">Home</a></li>
+              <li><i class="fa fa-home"></i><a href="{{ url('list') }}">Home</a></li>
               <li><i class="icon_document_alt"></i>Forms</li>
               <li><i class="fa fa-files-o"></i>Form Validation</li>
             </ol>
@@ -26,26 +26,39 @@
                 <div class="form">
                   <form class="form-validate form-horizontal" id="feedback_form" method="POST" action="/userPwd">
                    {{ csrf_field() }}
+                   @if (count($accounts))
                    <div class="form-group ">
-                      <label for="grade" class="control-label col-lg-2">분류 <span class="required">*</span></label>
+                      <label for="sadver" class="control-label col-lg-2">대상 계정</label>
                       <div class="col-lg-10">
-                      <?php $tval = DB::table('users')->orderBy('id','desc')->get();?>
-                      <select name ="sadver" class="form-control m-bot10" style="padding-left:0; background:none; width:150px; height:35px; " onchange="call_proc6(help_li);">
-                 <option value="0"> 전체보기</option>
-                 @foreach ($tval as $ser)
-                 <option value="{{$ser->id}}" 
-                 @if ($ser->id == request('sadver') )selected @endif > 
-                 {{$ser->email}} / {{$ser->id}}</option>
-                 @endforeach()
-             </select>
+                      <select name="sadver" id="sadver" class="form-control m-bot10" style="padding-left:0; background:none; width:250px; height:35px; ">
+                        <option value="0">본인 계정</option>
+                        @foreach ($accounts as $ser)
+                        <option value="{{ $ser->id }}">{{ $ser->email }} / {{ $ser->id }}</option>
+                        @endforeach
+                      </select>
+                      <span class="help-block">본인 계정을 바꿀 때는 현재 비밀번호가 필요합니다.</span>
                       </div>
                     </div>
-                    
-                    
+                    @endif
+
                     <div class="form-group ">
-                      <label for="password" class="control-label col-lg-2">패스워드 <span class="required">*</span></label>
+                      <label for="current_password" class="control-label col-lg-2">현재 패스워드</label>
                       <div class="col-lg-10">
-                        <input class="form-control " id="password" type="password" name="password" required />
+                        <input class="form-control" id="current_password" type="password" name="current_password" autocomplete="current-password" />
+                      </div>
+                    </div>
+
+                    <div class="form-group ">
+                      <label for="password" class="control-label col-lg-2">새 패스워드 <span class="required">*</span></label>
+                      <div class="col-lg-10">
+                        <input class="form-control" id="password" type="password" name="password" minlength="8" autocomplete="new-password" required />
+                      </div>
+                    </div>
+
+                    <div class="form-group ">
+                      <label for="password_confirmation" class="control-label col-lg-2">새 패스워드 확인 <span class="required">*</span></label>
+                      <div class="col-lg-10">
+                        <input class="form-control" id="password_confirmation" type="password" name="password_confirmation" minlength="8" autocomplete="new-password" required />
                       </div>
                     </div>
                     

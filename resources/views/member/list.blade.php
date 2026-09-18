@@ -19,16 +19,17 @@
             <form name="help_li" class="navbar-form" action="/list" method="GET">
              {{csrf_field()}}
             <div class="col-lg-5">
+            @if ((int) Auth::guard('member')->user()->grade >= 9)
             <?php $tval = DB::table('users')->orderBy('username','desc')->get();?>
-            
             <select name ="sadver" class="form-control m-bot10" style="padding-left:0; background:none; width:150px; height:35px; " onchange="call_proc6(help_li);">
                  <option value="0"> 전체보기</option>
                  @foreach ($tval as $ser)
-                 <option value="{{$ser->id}}" 
-                 @if ($ser->id == request('sadver') )selected @endif > 
+                 <option value="{{$ser->id}}"
+                 @if ($ser->id == request('sadver') )selected @endif >
                  {{$ser->username}} / {{$ser->id}}</option>
                  @endforeach()
              </select>
+            @endif
              
              <select name ="smode" class="form-control m-bot10" style="padding-left:0; background:none; width:150px;  height:35px;">
                  <option value="1" @if ( request('smode') == 1 )
@@ -48,7 +49,6 @@
                  시작일: <input autocomplete="false" class="form-control" type="text" id="fromDate" name="start_date" value="{{ old('start_date') ? old('start_date') : request('start_date') }}" >
                  종료일: <input  autocomplete="false"  class="form-control" type="text" id="toDate" name="end_date"  value="{{ old('end_date') ? old('end_date') : request('end_date') }}" >
                  
-                 <input  class="form-control" type="hidden" id="toDate2" name="end_date2"  value="{{ old('end_date2') ? old('end_date2') : request('end_date2') }}">
                  
                  <button type="submit" class="btn btn-primary" style="">검색</button>
                  
@@ -168,7 +168,6 @@
                         <input type="hidden" name="search" value="{{request('search')}}">
                         <input type="hidden" name="start_date" value="{{request('start_date')}}">
                         <input type="hidden" name="end_date"value="{{request('end_date')}}">
-                        <input type="hidden" name="end_date2"value="{{request('end_date2')}}">
 
                    </form>
                        </div>
@@ -182,7 +181,6 @@
                         <input type="hidden" name="search" value="{{request('search')}}">
                         <input type="hidden" name="start_date" value="{{request('start_date')}}">
                         <input type="hidden" name="end_date"value="{{request('end_date')}}">
-                        <input type="hidden" name="end_date2"value="{{request('end_date2')}}">
 
                    </form>
                        </div>
@@ -211,7 +209,7 @@
 
    
 <!--
-   <link rel="stylesheet" href="http://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css"/>
+   <link rel="stylesheet" href="https://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css"/>
    
 -->
    

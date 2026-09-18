@@ -78,7 +78,7 @@
     <script src="/js/sparklines.js"></script>
     <script src="/js/charts.js"></script>
     <script src="/js/jquery.slimscroll.min.js"></script>
-    <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/i18n/datepicker-ko.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/i18n/datepicker-ko.js"></script>
            <script>
                $(function() {
                $("#today").text(new Date().toLocaleDateString());
@@ -96,14 +96,7 @@
                changeMonth: true,
                onClose: function( selectedDate ) {
                $("#fromDate").datepicker( "option", "maxDate", selectedDate );
-               var newdate = new Date(selectedDate);
-               newdate.setDate(newdate.getDate()+1);
-               newdate = date_to_str(newdate);
-               $("#toDate2").val(newdate );
                }
-               });
-               $('#toDate2').datepicker({
-               dateFormat: "yy-mm-dd",
                });
                });
                function date_to_str(format)
