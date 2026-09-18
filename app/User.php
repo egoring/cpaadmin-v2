@@ -1,0 +1,54 @@
+<?php
+
+namespace App;
+
+use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+
+class User extends Authenticatable
+{
+    use Notifiable;
+    public $table = "users";
+    
+      public static $rules = [
+        'email' => ['unique'],
+//        'body' => ['required', 'min:10']
+    ];
+    
+//    public static $rules = [
+//        'name' => 'required',
+//        'username' => 'required',
+//        'event_name' => 'required',
+//        'event_url' => 'required',
+//        'page_url' => 'required'
+//    ];
+    
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    protected $fillable = [
+         'name', 'user_id', 'username', 'password', 'grade', 'tel', 'email',
+    ];
+
+    /**
+     * The attributes that should be hidden for arrays.
+     *
+     * @var array
+     */
+    protected $hidden = [
+        'password', 'remember_token',
+    ];
+
+    /**
+     * The attributes that should be cast to native types.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+    ];
+}
