@@ -3,7 +3,6 @@
 namespace App\Http\Middleware;
 
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken as Middleware;
-use Closure;
 
 class VerifyCsrfToken extends Middleware
 {
@@ -20,14 +19,8 @@ class VerifyCsrfToken extends Middleware
      * @var array
      */
     
-    public function handle($request, Closure $next) {
-        $response = $next($request);
-//        $response->header('P3P', 'CP="IDC DSP COR ADM DEVi TAIi PSA PSD IVAi IVDi CONi HIS OUR IND CNT"');
-        return $response;
-    }
-    
     protected $except = [
-        '/post'
-        //
+        // 외부 광고 랜딩페이지에서 들어오는 유입 폼만 예외로 둔다.
+        'crm/member',
     ];
 }
