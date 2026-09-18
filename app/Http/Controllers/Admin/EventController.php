@@ -7,7 +7,6 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Event;
-use Input;
 use RealRashid\SweetAlert\Facades\Alert;
 class EventController extends Controller
 {
@@ -36,8 +35,16 @@ class EventController extends Controller
     
     /*이벤트 생성*/
      public function eventCreate() {
+         $me = Auth::guard('member')->user();
+
+         // 관리자가 아니면 자기 자신 외의 advertiser_id 로는 만들 수 없다.
+         $advertiserId = (int) request('adv_id');
+         if ((int) $me->grade < 9) {
+             $advertiserId = (int) $me->id;
+         }
+
          $model = new Event;
-         $model-> advertiser_id = request('adv_id');
+         $model-> advertiser_id = $advertiserId;
          $model-> media_id = request('media_id');
          $model-> event_name = request('event_name');
          $model-> event_url = request('event_url');
@@ -45,7 +52,6 @@ class EventController extends Controller
          $model-> reg_date = date( 'Y-m-d H:i:s', time() );
          
          $model->save();
-//        DB::table('event')->insert(
 //            ['advertiser_id' => request('adv_id'), 'media_id' => request('media_id') , 'event_name' => request('event_name') , 'event_url' => request('event_url') , 'page_url' => request('page_url'), 'reg_date'=>'now()']
 //        );
          Alert::success('성공', '이벤트가 생성되었습니다');

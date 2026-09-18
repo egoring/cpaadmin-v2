@@ -28,7 +28,6 @@ class LoginController extends Controller
      */
     protected $redirectTo = '/list';
     protected $guard = 'member';
-//    protected $user_id = 'user_id';
 
     /**
      * Create a new controller instance.
@@ -45,16 +44,10 @@ class LoginController extends Controller
     }
     
     public function showLoginForm() {
-        echo Auth::guard('member')->check();
-        if(Auth::guard('member')->check()) {
-//            echo Auth::guard('member')->check();
-//            exit;
+        if (Auth::guard('member')->check()) {
             return redirect('/list');
-        } 
-//        else if(Auth::guard('member')->check() === false){
-//            Alert::error('에러', '로그인 실패');
-//            return view('login');
-//        }
+        }
+
         return view('login');
     }
     
@@ -62,10 +55,5 @@ class LoginController extends Controller
         Auth::guard('member') ->logout();
         Alert::success('성공', '로그아웃 되었습니다');
         return redirect('/');
-        
     }
-    
-//    public function userId() {
-//  return 'user_id';
-//}
 }

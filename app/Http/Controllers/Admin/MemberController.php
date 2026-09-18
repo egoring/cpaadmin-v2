@@ -15,37 +15,36 @@ use RealRashid\SweetAlert\Facades\Alert;
 use App\User;
 use App\Exports\userExport;
 use App\Exports\memberExport;
-use Input;
+use App\Support\RefererGuard;
+use App\Support\SearchFilter;
 
 class MemberController extends Controller
 {
     use Exportable;
     public function store(Request $request) {
-//       print_r(request('tel2'));
-//        exit;
-//        if(!request('name')) {
-//            return back();
-//        }
-//           $location = wp_sanitize_redirect(request('name'));
         $name = request('name');
-        $age = request('age');
-
         $etc = request('etc');
         $tel = request('tel1')."-".request('tel2')."-".request('tel3');
         
         $memo = "문의사항 ".request('etc');
-        $referer = request('referer');
-        if(!request('tel2')||!request('tel3')) {
-            return redirect()->away($referer)->with('경고', '전화번호를 입력해 주세요.');
+
+        // 허용 호스트의 주소만 되돌려보낸다.
+        $referer = RefererGuard::fromConfig()->sanitize(request('referer'));
+
+        if(!request('tel1')||!request('tel2')||!request('tel3')) {
+            return $this->backToLanding($referer, '전화번호를 입력해 주세요.');
         }
-        $detailAgent = $_SERVER['HTTP_USER_AGENT'];
+        if(!request('midx') || !request('idx')) {
+            return $this->backToLanding($referer, '잘못된 접근입니다.');
+        }
+        $detailAgent = $request->userAgent();
         $midx = request('midx');
         $idx = request('idx');
         $media = request('media');
         $baddr = request('baddr');
         $ccode = request('ccode');
         $cppID = request('cppID');
-        $bIp = $_SERVER['REMOTE_ADDR'];
+        $bIp = $request->ip();
         
         DB::table('member')->insert(
             ['midx' => $midx, 
@@ -76,7 +75,17 @@ class MemberController extends Controller
              'cppID' => $cppID
             ]
         );
-        return redirect()->away($referer);
+        return $this->backToLanding($referer);
+    }
+
+    /** 랜딩페이지로 되돌리되, 허용되지 않은 주소면 자체 페이지로 보낸다. */
+    private function backToLanding($referer, $message = null) {
+        if ($referer === null) {
+            return $message === null ? redirect('/') : redirect('/')->with('경고', $message);
+        }
+        return $message === null
+            ? redirect()->away($referer)
+            : redirect()->away($referer)->with('경고', $message);
     }
     
     public function exceldown(Request $request) {
@@ -155,14 +164,7 @@ class MemberController extends Controller
         return Excel::download(new memberExport($sadver,$search,$smode,$start_date,$end_date),$filename.'.csv');
     }
     
-    
-    /*광고주 전체 가져오기*/
-    public function get_idx_all() {
-    $users = DB::table('users')->get();
 
-    return $users;
-    }
-    
     
     /*관리자 전체 리스트*/
     public function index()
@@ -209,37 +211,19 @@ class MemberController extends Controller
             }
         }
         
-//        $date = date("Y-m-d", strtotime( request('end_date') ) );
-           $date = date('Y-m-d', strtotime(request('start_date')));
-        $date2 = date('Y-m-d', strtotime(request('end_date')));
-//date('Y-m-d', strtotime(request('start_date')))
-//        date('Y-m-d', strtotime(request('start_date'))
-//        $end_time = strtotime("+1 days",$date2 );
-//        echo $date2;
-        if(request()->has('start_date') && request()->has('end_date')) {
-            if(request('start_date') != "" && request('end_date') != "") {
-                $member -> where('member.inputdate','>=',request('start_date'));
-//            break;
-                $member -> where('member.inputdate','<=',request('end_date2'));
-//            break;
-                
-//                $member = $member->whereBetween('member.inputdate', [$date, $date2]);
-//                $member = $member->orWhereBetween('member.inputdate', [$date, $date2]);
-                
+        // 기간 경계는 서버에서 계산한다 (SearchFilter::endBoundary).
+        if (SearchFilter::hasRange(request('start_date'), request('end_date'))) {
+            $endBoundary = SearchFilter::endBoundary(request('end_date'));
+            if ($endBoundary !== null) {
+                $member = $member->where('member.inputdate', '>=', trim(request('start_date')));
+                $member = $member->where('member.inputdate', '<', $endBoundary);
             }
         }
+
         
-        if(request()->has('sort')) {
-            $member = $member -> orderBy('member.msn',request('sort'));
-        } else {
-            $member = $member -> orderBy('member.msn','desc');
-        }
-        
-        if(request()->has('recordPerPage')) {
-            $pageNum = request('recordPerPage');
-        } else {
-            $pageNum = 15;
-        }
+        $member = $member->orderBy('member.msn', SearchFilter::sortDirection(request('sort')));
+
+        $pageNum = SearchFilter::perPage(request('recordPerPage'));
         
         $member = $member->paginate($pageNum)->appends([
             'smode' => request('smode'), 
@@ -252,16 +236,11 @@ class MemberController extends Controller
         ]);
         
         return view('member.list', compact('member'));
-//        return view('member.list', [
 //            'invoices' => Invoice::all()
 //        ]);
 
     }
-    
-//    public function store() {
-//        
-//    }
-    
+
     /*리스트 삭제*/
     public function delete(Request $request, $id) {
         $userGrade = Auth::guard('member')->user()->grade;
@@ -303,48 +282,19 @@ class MemberController extends Controller
                     Alert::warning('실패', '잘못된 접근입니다');
                 }
             break;
-//                
-//            default:
-//            break
+
+            default:
+                Alert::warning('실패', '삭제 권한이 없습니다');
+            break;
         }
         
-//        if($userGrade == 1) { 
-//            DB::table('member') ->where('msn','=',$id)
 //            ->where('idx','=',$userIdx)
 //            ->update(['v_status' => 4]);
-//        } else if ($userGrade == 2) {
-//            DB::table('member') ->where('msn','=',$id)
 //            ->where('midx','=',$userIdx)
 //            ->update(['v_status' => 4]);
-//        } else {
-//            DB::table('member')
 //            ->where('msn','=',$id)
 //            ->update(['v_status' => 4]);
-//        }
-//        Alert::success('성공', '삭제되었습니다');
         return back();
     }
    
-    public function refresh() {
-        echo "<script>location.reload();</script>";
-    }
-    
-    public function accJoin() {
-        return view('member.join');
-        
-    }
-    
-    public function accList() {
-        return view('member.acc');
-        
-    }
-    
-    public function eventList() {
-        return view('member.event');
-    }
-    
-    public function eventAdd() {
-        
-    }
-    
 }

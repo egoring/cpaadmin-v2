@@ -4,6 +4,7 @@ namespace App\Exports;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Support\SearchFilter;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\FromArray;
@@ -15,10 +16,6 @@ class memberExport implements FromCollection
 {
     use Exportable;
 
-//    public function __construct(int $idx)
-//    {
-//        $this->idx = $idx;
-//    }
 
     
     public function __construct(string $idx, string $search, string $smode, string $start_date, string $end_date)
@@ -49,15 +46,13 @@ class memberExport implements FromCollection
         } 
         
         /*관리자 전용*/
-        if(!is_null($this->idx) ) {
+        if($this->idx !== '' && $this->idx != 0) {
             if($userGrade>8) {
-                if($this->idx!=0) {
-                    $member = $member -> where('member.idx','=',$this->idx);
-                } 
+                $member = $member -> where('member.idx','=',$this->idx);
             }
         }
-        
-        if(!is_null($this->smode)) {
+
+        if($this->smode !== '') {
             switch($this->smode) {
             case 1:
             $member = $member -> where('member.media_code','LIKE','%'.$this->search.'%');
@@ -75,10 +70,12 @@ class memberExport implements FromCollection
             }
         }
         
-        if(!is_null($this->start_date) && !is_null($this->end_date)) {
-            if($this->start_date!= "" && $this->end_date != "") {
-                $member -> where('member.inputdate','>=',request('start_date'));
-                $member -> where('member.inputdate','<=',request('end_date2'));
+        // 내보내기는 화면과 같은 기간 규칙을 쓴다.
+        if (SearchFilter::hasRange($this->start_date, $this->end_date)) {
+            $endBoundary = SearchFilter::endBoundary($this->end_date);
+            if ($endBoundary !== null) {
+                $member = $member->where('member.inputdate', '>=', trim($this->start_date));
+                $member = $member->where('member.inputdate', '<', $endBoundary);
             }
         }
         
